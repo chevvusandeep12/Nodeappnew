@@ -1,0 +1,72 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKER_COMPOSE_VERSION = '1.29.2' // Define Docker Compose version
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/chevvusandeep12/Nodeappnew.git'
+            }
+            post {
+                always {
+                    script {
+                        cleanDockerImage()
+                    }
+                }
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                script {
+                    try {
+                        docker.build('my-node-app', '-f Dockerfile .') // Build Docker image
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error("Failed to build Docker image: ${e.message}")
+                    }
+                }
+            }
+            post {
+                always {
+                    script {
+                        cleanDockerImage()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    try {
+                        sh 'docker-compose up -d' // Start the application using Docker Compose
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error("Failed to deploy application using Docker Compose: ${e.message}")
+                    }
+                }
+            }
+            post {
+                always {
+                    script {
+                        cleanDockerImage()
+                    }
+                }
+            }
+        }
+    }
+}
+
+def cleanDockerImage() {
+    script {
+        try {
+            docker.image('my-node-app').remove() // Clean up Docker image after use
+        } catch (Exception e) {
+            echo "Failed to clean Docker image: ${e.message}"
+        }
+    }
+}
