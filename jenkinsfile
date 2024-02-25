@@ -7,10 +7,11 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            steps {
-                git 'https://github.com/chevvusandeep12/Nodeappnew.git'
-            }
-        }
+    steps {
+        git branch: 'main', url: 'https://github.com/chevvusandeep12/Nodeappnew.git'
+    }
+}
+
         
         stage('Build') {
             steps {
