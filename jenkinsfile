@@ -6,6 +6,12 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/chevvusandeep12/Nodeappnew.git'
+            }
+        }
+        
         stage('Build') {
             steps {
                 script {
