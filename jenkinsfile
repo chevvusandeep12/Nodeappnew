@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKER_COMPOSE_VERSION = '1.29.2' // Define Docker Compose version
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    docker.build('my-node-app', '-f Dockerfile .') // Build Docker image
+                }
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                script {
+                    docker.image('my-node-app').run('--name my-node-app-test --rm npm run test') // Run tests inside the container
+                }
+            }
+        }
+        
+        stage('Lint') {
+            steps {
+                script {
+                    docker.image('my-node-app').run('--name my-node-app-lint --rm npm run lint') // Run linting inside the container
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
+                        docker.image('my-node-app').push("${env.BUILD_NUMBER}") // Push Docker image to Docker Hub
+                    }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    sh 'docker-compose up -d' // Start the application using Docker Compose
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                docker.image('my-node-app').remove() // Clean up Docker image after use
+            }
+        }
+    }
+}
