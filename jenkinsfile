@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/chevvusandeep12/Nodeappnew.git'
+                git branch: 'main', url: 'https://github.com/Deepak2202-del/nodejs.git'
             }
             post {
                 always {
