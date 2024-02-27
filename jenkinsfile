@@ -30,13 +30,6 @@ pipeline {
                     }
                 }
             }
-            post {
-                always {
-                    script {
-                        cleanDockerImage()
-                    }
-                }
-            }
         }
 
         stage('Deploy') {
@@ -50,12 +43,13 @@ pipeline {
                     }
                 }
             }
-            post {
-                always {
-                    script {
-                        cleanDockerImage()
-                    }
-                }
+        }
+    }
+
+    post {
+        always {
+            script {
+                cleanDockerImage()
             }
         }
     }
